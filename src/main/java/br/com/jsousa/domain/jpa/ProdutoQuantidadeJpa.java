@@ -77,4 +77,17 @@ public class ProdutoQuantidadeJpa {
 	public void setVenda(VendaJpa venda) {
 		this.venda = venda;
 	}
+
+	public void adicionar(Integer quantidade) {
+		this.quantidade += quantidade;
+		BigDecimal novoValor = this.produto.getValor().multiply(BigDecimal.valueOf(quantidade));
+		BigDecimal novoTotal = this.valorTotal.add(novoValor);
+		this.valorTotal = novoTotal;
+	}
+
+	public void remover(Integer quantidade) {
+		this.quantidade -= quantidade;
+		BigDecimal novoValor = this.produto.getValor().multiply(BigDecimal.valueOf(quantidade));
+		this.valorTotal = valorTotal.subtract(novoValor);
+	}
 }

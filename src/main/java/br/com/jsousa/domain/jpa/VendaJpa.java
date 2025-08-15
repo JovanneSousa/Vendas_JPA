@@ -2,6 +2,8 @@ package br.com.jsousa.domain.jpa;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -22,6 +24,10 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "TB_VENDA")
 public class VendaJpa implements Persistente {
+	
+	public VendaJpa() {
+		produtos = new HashSet<>();
+	}
 	
 	public enum Status {
 		INICIADA, CONCLUIDA, CANCELADA;
@@ -120,4 +126,67 @@ public class VendaJpa implements Persistente {
 		this.status = status;
 	}
 
+	public void adicionarProduto(ProdutoJpa produto, Integer quantidade) {
+		validarStatus();
+		Optional<ProdutoQuantidadeJpa> op = 
+				produtos.stream().filter(filter -> filter.getProduto().getCodigo().equals(produto.getCodigo())).findAny();
+		if (op.isPresent()) {
+			ProdutoQuantidadeJpa produtpQtd = op.get();
+			produtpQtd.adicionar(quantidade);
+		} else {
+			// Criar fabrica para criar ProdutoQuantidade
+			ProdutoQuantidadeJpa prod = new ProdutoQuantidadeJpa();
+			prod.setVenda(this);
+			prod.setProduto(produto);
+			prod.adicionar(quantidade);
+			produtos.add(prod);
+		}
+		recalcularValorTotalVenda();
+	}
+
+	private void validarStatus() {
+		if (this.status == Status.CONCLUIDA) {
+			throw new UnsupportedOperationException("IMPOSSÍVEL ALTERAR VENDA FINALIZADA");
+		}
+	}
+	
+	public void removerProduto(ProdutoJpa produto, Integer quantidade) {
+		validarStatus();
+		Optional<ProdutoQuantidadeJpa> op = 
+				produtos.stream().filter(filter -> filter.getProduto().getCodigo().equals(produto.getCodigo())).findAny();
+		
+		if (op.isPresent()) {
+			ProdutoQuantidadeJpa produtpQtd = op.get();
+			if (produtpQtd.getQuantidade()>quantidade) {
+				produtpQtd.remover(quantidade);
+				recalcularValorTotalVenda();
+			} else {
+				produtos.remove(op.get());
+				recalcularValorTotalVenda();
+			}
+			
+		}
+	}
+	
+	public void removerTodosProdutos() {
+		validarStatus();
+		produtos.clear();
+		valorTotal = BigDecimal.ZERO;
+	}
+	
+	public Integer getQuantidadeTotalProdutos() {
+		// Soma a quantidade getQuantidade() de todos os objetos ProdutoQuantidade
+		int result = produtos.stream()
+		  .reduce(0, (partialCountResult, prod) -> partialCountResult + prod.getQuantidade(), Integer::sum);
+		return result;
+	}
+	
+	public void recalcularValorTotalVenda() {
+		//validarStatus();
+		BigDecimal valorTotal = BigDecimal.ZERO;
+		for (ProdutoQuantidadeJpa prod : this.produtos) {
+			valorTotal = valorTotal.add(prod.getValorTotal());
+		}
+		this.valorTotal = valorTotal;
+	}
 }

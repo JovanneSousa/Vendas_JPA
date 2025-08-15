@@ -8,5 +8,4 @@ public class ProdutoJpaDAO extends GenericJpaDB1DAO<ProdutoJpa, Long> implements
 	public ProdutoJpaDAO() {
 		super(ProdutoJpa.class);
 	}
-
 }

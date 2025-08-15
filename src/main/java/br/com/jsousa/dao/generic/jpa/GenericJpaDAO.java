@@ -77,7 +77,7 @@ public class GenericJpaDAO <T extends Persistente, E extends Serializable> imple
 		return list;
 	}
 
-	private void closeConnection() {
+	protected void closeConnection() {
 		entityManager.close();
 		entityManagerFactory.close();
 	}
@@ -91,7 +91,7 @@ public class GenericJpaDAO <T extends Persistente, E extends Serializable> imple
 		
 	}
 
-	private void openConnection() {
+	protected void openConnection() {
 		entityManagerFactory = 
 				Persistence.createEntityManagerFactory(getPersistenceUnitName());
 		entityManager = entityManagerFactory.createEntityManager();
