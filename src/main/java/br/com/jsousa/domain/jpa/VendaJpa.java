@@ -67,7 +67,7 @@ public class VendaJpa implements Persistente {
 	private Instant dataVenda;
 	
 	@Enumerated(EnumType.STRING)
-	@Column(name = "STATUS", nullable = false)
+	@Column(name = "STATUS_VENDA", nullable = false)
 	private Status status;
 	
 	public Long getId() {
