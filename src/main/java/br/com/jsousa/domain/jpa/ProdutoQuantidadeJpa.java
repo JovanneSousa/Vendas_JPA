@@ -1,0 +1,80 @@
+package br.com.jsousa.domain.jpa;
+
+import java.math.BigDecimal;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "TB_PRODUTO_QUANTIDADE")
+public class ProdutoQuantidadeJpa {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "prod_qtd_sq")
+	@SequenceGenerator(name = "prod_qtd_sq", sequenceName = "sq_prod_qtd", initialValue = 1, allocationSize = 1)
+	private Long id;
+	
+	@ManyToOne(cascade = CascadeType.ALL)
+	private ProdutoJpa produto;
+	
+	@Column(name = "QUANTIDADE", nullable = false)
+	private Integer quantidade;
+	
+	@Column(name = "VALOR_TOTAL", nullable = false)
+	private BigDecimal valorTotal;
+	
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "id_venda_fk",
+		foreignKey = @ForeignKey(name = "fk_prod_qtd_venda"),
+		referencedColumnName = "id", nullable = false)
+	private VendaJpa venda;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public ProdutoJpa getProduto() {
+		return produto;
+	}
+
+	public void setProduto(ProdutoJpa produto) {
+		this.produto = produto;
+	}
+
+	public Integer getQuantidade() {
+		return quantidade;
+	}
+
+	public void setQuantidade(Integer quantidade) {
+		this.quantidade = quantidade;
+	}
+
+	public BigDecimal getValorTotal() {
+		return valorTotal;
+	}
+
+	public void setValorTotal(BigDecimal valorTotal) {
+		this.valorTotal = valorTotal;
+	}
+
+	public VendaJpa getVenda() {
+		return venda;
+	}
+
+	public void setVenda(VendaJpa venda) {
+		this.venda = venda;
+	}
+}
